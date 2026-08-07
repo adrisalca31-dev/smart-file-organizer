@@ -24,7 +24,11 @@ def main() -> None:
         "Others": 0,
     }
 
-    for file in files:
+    for index, file in enumerate(files, start=1):
+
+        print("-" * 35)
+        print(f"[{index}/{len(files)}] Processing: {file.name}")
+
         category = get_file_category(file)
 
         summary[category] += 1
