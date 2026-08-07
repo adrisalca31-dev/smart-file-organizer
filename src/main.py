@@ -10,12 +10,29 @@ def scan_files(folder: Path) -> list[Path]:
     if not folder.is_dir():
         raise NotADirectoryError(f"Not a folder: {folder}")
 
-    return [item for item in folder.iterdir() if item.is_file()]
+    return [
+    item
+    for item in folder.iterdir()
+    if item.is_file() and not item.name.startswith(".")
+]
 
 
 def select_folder() -> Path:
-    folder_input = input("Enter folder path: ").strip().strip("'\"")
-    return Path(folder_input)
+    """Prompt the user until a valid folder path is entered."""
+
+    while True:
+        folder_input = input("Enter folder path: ").strip().strip("'\"")
+        folder = Path(folder_input)
+
+        if not folder.exists():
+            print("Error: Folder not found.\n")
+            continue
+
+        if not folder.is_dir():
+            print("Error: That path is not a folder.\n")
+            continue
+
+        return folder
 
 
 def get_file_category(file_path: Path) -> str:
