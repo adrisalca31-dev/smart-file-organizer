@@ -1,5 +1,8 @@
 from pathlib import Path
 
+IGNORED_FILES = {
+    "organization_log.txt",
+}
 
 def scan_files(folder: Path) -> list[Path]:
     """Return all visible files contained in the selected folder."""
@@ -11,10 +14,14 @@ def scan_files(folder: Path) -> list[Path]:
         raise NotADirectoryError(f"Not a folder: {folder}")
 
     return [
-        item
-        for item in folder.iterdir()
-        if item.is_file() and not item.name.startswith(".")
-    ]
+    item
+    for item in folder.iterdir()
+    if (
+        item.is_file()
+        and not item.name.startswith(".")
+        and item.name not in IGNORED_FILES
+    )
+]
 
 
 def select_folder() -> Path:
