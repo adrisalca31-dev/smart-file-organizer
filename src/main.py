@@ -1,11 +1,16 @@
 from pathlib import Path
 import time
 
-from logger import write_log
 from scanner import scan_files, select_folder
 from categorizer import get_file_category
 from organizer import create_category_folder, move_file
+from logger import write_log
+from duplicate_checker import is_duplicate
+from cli import parse_arguments
 
+args = parse_arguments()
+
+preview_mode = args.dry_run
 
 def main() -> None:
     """Run the Smart File Organizer application."""
@@ -15,6 +20,8 @@ def main() -> None:
 
     folder = select_folder()
     files = scan_files(folder)
+     
+    start_time = time.perf_counter()
 
     print(f"\nFound {len(files)} file(s).\n")
 
@@ -27,12 +34,30 @@ def main() -> None:
         "Others": 0,
     }
 
+    seen_hashes: set[str] = set()
+    duplicates = 0
+
     log_lines: list[str] = []
 
     for index, file in enumerate(files, start=1):
 
         print("-" * 35)
         print(f"[{index}/{len(files)}] Processing: {file.name}")
+
+        if is_duplicate(file, seen_hashes):
+            duplicate_folder = create_category_folder(folder, "Duplicates")
+
+            move_file(file, duplicate_folder)
+
+            print(f"{file.name} -> Duplicate detected")
+            print(f"Moved to: {duplicate_folder}\n")
+
+            log_lines.append(
+                f"{file.name} -> DUPLICATE (Moved to Duplicates)"
+            )
+
+            duplicates += 1
+            continue
 
         category = get_file_category(file)
 
@@ -52,12 +77,12 @@ def main() -> None:
     elapsed_time = end_time - start_time
 
     write_log(
-        folder,
-        log_lines,
-        summary,
-        len(files),
-        elapsed_time,
-    )
+       folder,
+       log_lines,
+       summary,
+       len(files) - duplicates,
+       elapsed_time,
+)
 
     print("-" * 35)
     print("Organization completed!\n")
@@ -65,7 +90,8 @@ def main() -> None:
     for category, count in summary.items():
         print(f"{category}: {count}")
 
-    print(f"\nTotal files moved: {len(files)}")
+    print(f"\nDuplicates skipped: {duplicates}")
+    print(f"Total files moved: {len(files) - duplicates}")
     print(f"Execution time: {elapsed_time:.2f} seconds")
     print("-" * 35)
 
