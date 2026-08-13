@@ -17,14 +17,12 @@ def write_log(
         file.write("Smart File Organizer Log\n")
         file.write("=" * 30 + "\n\n")
 
-        for line in log_lines:
-            file.write(line + "\n")
+        file.writelines(line + "\n" for line in log_lines)
 
         file.write("\n")
         file.write("-" * 30 + "\n")
 
-        for category, count in summary.items():
-            file.write(f"{category}: {count}\n")
+        file.writelines(f"{category}: {count}\n" for category, count in summary.items())
 
         file.write(f"\nTotal files moved: {total_files}\n")
         file.write(f"Execution time: {execution_time:.2f} seconds\n")

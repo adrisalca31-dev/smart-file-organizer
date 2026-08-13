@@ -1,6 +1,7 @@
 from pathlib import Path
 from shutil import move
 
+
 def create_category_folder(folder: Path, category: str) -> Path:
     """Create a category folder if it does not already exist."""
 

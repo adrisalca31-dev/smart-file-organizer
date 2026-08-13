@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def get_file_category(file_path: Path) -> str:
     """Return the category of a file based on its extension."""
 
