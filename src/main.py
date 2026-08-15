@@ -7,12 +7,12 @@ from logger import write_log
 from organizer import create_category_folder, move_file
 from scanner import scan_files, select_folder
 
-args = parse_arguments()
-preview_mode = args.dry_run
-
 
 def main() -> None:
     """Run the Smart File Organizer application."""
+
+    args = parse_arguments()
+    preview_mode = args.dry_run
 
     print("Welcome to Smart File Organizer!")
 
