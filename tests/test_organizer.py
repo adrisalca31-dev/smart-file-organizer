@@ -38,3 +38,68 @@ def test_move_file_moves_file_to_destination(tmp_path: Path) -> None:
     assert not file.exists()
     assert moved_file.exists()
     assert moved_file.read_text(encoding="utf-8") == "Test content"
+
+
+def test_move_file_renames_file_when_destination_exists(
+    tmp_path: Path,
+) -> None:
+    source_folder = tmp_path / "source"
+    destination_folder = tmp_path / "destination"
+
+    source_folder.mkdir()
+    destination_folder.mkdir()
+
+    existing_file = destination_folder / "example.txt"
+    existing_file.write_text("Original content", encoding="utf-8")
+
+    file = source_folder / "example.txt"
+    file.write_text("New content", encoding="utf-8")
+
+    move_file(file, destination_folder)
+
+    renamed_file = destination_folder / "example_1.txt"
+
+    assert existing_file.exists()
+    assert existing_file.read_text(encoding="utf-8") == "Original content"
+
+    assert renamed_file.exists()
+    assert renamed_file.read_text(encoding="utf-8") == "New content"
+
+    assert not file.exists()
+
+
+def test_move_file_increments_filename_when_multiple_conflicts_exist(
+    tmp_path: Path,
+) -> None:
+    source_folder = tmp_path / "source"
+    destination_folder = tmp_path / "destination"
+
+    source_folder.mkdir()
+    destination_folder.mkdir()
+
+    (destination_folder / "example.txt").write_text(
+        "Original",
+        encoding="utf-8",
+    )
+    (destination_folder / "example_1.txt").write_text(
+        "First duplicate",
+        encoding="utf-8",
+    )
+
+    file = source_folder / "example.txt"
+    file.write_text("New content", encoding="utf-8")
+
+    move_file(file, destination_folder)
+
+    renamed_file = destination_folder / "example_2.txt"
+
+    assert renamed_file.exists()
+    assert renamed_file.read_text(encoding="utf-8") == "New content"
+
+    assert (destination_folder / "example.txt").read_text(
+        encoding="utf-8"
+    ) == "Original"
+
+    assert (destination_folder / "example_1.txt").read_text(
+        encoding="utf-8"
+    ) == "First duplicate"
