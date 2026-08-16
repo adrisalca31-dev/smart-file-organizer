@@ -78,3 +78,24 @@ def test_complete_file_organization_workflow(tmp_path: Path) -> None:
     assert not pdf.exists()
     assert not duplicate.exists()
     assert not unknown.exists()
+
+
+def test_complete_workflow_handles_filename_conflict(tmp_path: Path) -> None:
+    source_folder = tmp_path / "source"
+    source_folder.mkdir()
+
+    destination_folder = create_category_folder(tmp_path, "Images")
+
+    existing_file = destination_folder / "photo.jpg"
+    existing_file.write_text("existing image", encoding="utf-8")
+
+    source_file = source_folder / "photo.jpg"
+    source_file.write_text("new image", encoding="utf-8")
+
+    move_file(source_file, destination_folder)
+
+    assert existing_file.exists()
+    assert (destination_folder / "photo_1.jpg").exists()
+    assert (destination_folder / "photo_1.jpg").read_text(
+        encoding="utf-8"
+    ) == "new image"
