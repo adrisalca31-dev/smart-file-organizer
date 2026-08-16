@@ -37,6 +37,7 @@ def main() -> None:
 
     seen_hashes: set[str] = set()
     duplicates = 0
+    failed_files = 0
     log_lines: list[str] = []
 
     for index, file in enumerate(files, start=1):
@@ -52,11 +53,17 @@ def main() -> None:
                 print("Action: Would move to Duplicates\n")
                 log_lines.append(f"{file.name} -> DUPLICATE (Would move to Duplicates)")
             else:
-                duplicate_folder = create_category_folder(folder, "Duplicates")
-                move_file(file, duplicate_folder)
+                try:
+                    duplicate_folder = create_category_folder(folder, "Duplicates")
+                    move_file(file, duplicate_folder)
 
-                print(f"Moved to: {duplicate_folder}\n")
-                log_lines.append(f"{file.name} -> DUPLICATE (Moved to Duplicates)")
+                    print(f"Moved to: {duplicate_folder}\n")
+                    log_lines.append(f"{file.name} -> DUPLICATE (Moved to Duplicates)")
+                except OSError as error:
+                    failed_files += 1
+
+                    print(f"Error moving {file.name}: {error}\n")
+                    log_lines.append(f"{file.name} -> ERROR: {error}")
 
             continue
 
@@ -69,11 +76,17 @@ def main() -> None:
             print("Action: Would move to category folder\n")
             log_lines.append(f"{file.name} -> {category} (Would move)")
         else:
-            destination_folder = create_category_folder(folder, category)
-            move_file(file, destination_folder)
+            try:
+                destination_folder = create_category_folder(folder, category)
+                move_file(file, destination_folder)
 
-            print(f"Moved to: {destination_folder}\n")
-            log_lines.append(f"{file.name} -> {category}")
+                print(f"Moved to: {destination_folder}\n")
+                log_lines.append(f"{file.name} -> {category}")
+            except OSError as error:
+                failed_files += 1
+
+                print(f"Error moving {file.name}: {error}\n")
+                log_lines.append(f"{file.name} -> ERROR: {error}")
 
     end_time = time.perf_counter()
     elapsed_time = end_time - start_time
@@ -83,7 +96,7 @@ def main() -> None:
             folder,
             log_lines,
             summary,
-            len(files),
+            len(files) - failed_files,
             elapsed_time,
         )
 
@@ -98,8 +111,9 @@ def main() -> None:
         print(f"{category}: {count}")
 
     print(f"\nDuplicates found: {duplicates}")
+    print(f"Files with errors: {failed_files}")
 
-    files_to_organize = len(files) - duplicates
+    files_to_organize = len(files) - duplicates - failed_files
 
     if preview_mode:
         print(f"Files to organize: {files_to_organize}")
@@ -107,7 +121,9 @@ def main() -> None:
         print("\nNo files were moved.")
         print("No folders were created.")
     else:
-        print(f"Total files moved: {len(files)}")
+        print(f"Files organized: {files_to_organize}")
+        print(f"Files moved to Duplicates: {duplicates}")
+        print(f"Total files moved: {files_to_organize + duplicates}")
 
     print(f"Execution time: {elapsed_time:.2f} seconds")
     print("-" * 35)

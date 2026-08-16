@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from src.organizer import create_category_folder, move_file
 
 
@@ -103,3 +105,15 @@ def test_move_file_increments_filename_when_multiple_conflicts_exist(
     assert (destination_folder / "example_1.txt").read_text(
         encoding="utf-8"
     ) == "First duplicate"
+
+
+def test_move_file_raises_os_error_when_source_is_missing(
+    tmp_path: Path,
+) -> None:
+    destination_folder = tmp_path / "destination"
+    destination_folder.mkdir()
+
+    missing_file = tmp_path / "missing.txt"
+
+    with pytest.raises(OSError):
+        move_file(missing_file, destination_folder)
