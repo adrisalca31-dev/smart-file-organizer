@@ -11,6 +11,7 @@ The project was developed as a software engineering portfolio project, with an e
 - Image, document, PDF, video, audio, and other file categories
 - Duplicate file detection using SHA-256 hashing
 - Dedicated `Duplicates` folder for duplicate files
+- Automatic filename conflict handling
 - Hidden file detection and exclusion
 - Internal log file exclusion
 - Automatic creation of category folders
@@ -18,9 +19,13 @@ The project was developed as a software engineering portfolio project, with an e
 - Execution time measurement
 - Operation logging
 - CLI support
+- `--help` support
 - Preview / dry-run mode
 - Input folder validation
+- File movement error handling
 - Automated tests with Pytest
+- Code formatting with Black
+- Static analysis with Ruff
 
 
 ## Project Structure
@@ -45,7 +50,10 @@ The project was developed as a software engineering portfolio project, with an e
 │
 ├── tests/
 │   ├── test_categorizer.py
+│   ├── test_cli.py
 │   ├── test_duplicate_checker.py
+│   ├── test_integration.py
+│   ├── test_logger.py
 │   ├── test_organizer.py
 │   └── test_scanner.py
 │
@@ -68,6 +76,8 @@ Duplicate checker analyzes file hashes
 File categorizer determines the file type
         ↓
 Organizer creates the destination folder
+        ↓
+Filename conflict is checked
         ↓
 File is moved to its category
         ↓
@@ -120,6 +130,15 @@ If both files contain exactly the same data, the application identifies the seco
 Duplicates/
 
 
+## Filename Conflict Handling
+
+The organizer prevents existing files from being overwritten when two files have the same name.
+
+For example, if `photo.jpg` already exists in the destination folder, the application automatically generates a unique filename such as:
+
+```text
+photo_1.jpg
+```
 
 ## Logging
 
@@ -130,6 +149,7 @@ The log includes:
 * Files processed
 * File categories
 * Duplicate detections
+* File movement errors
 * Summary statistics
 * Execution time
 
@@ -142,39 +162,49 @@ The project includes a preview mode that allows users to inspect the operations 
 
 This provides a safer way to verify the expected organization before modifying the file system.
 
+Run the application in preview mode with:
+
+```bash
+python src/main.py --dry-run
+```
 
 ## Installation
 
 ### 1. Clone the repository
 
-bash
+```bash
 git clone https://github.com/adrisalca31-dev/smart-file-organizer.git
+```
 
 
 ### 2. Enter the project directory
 
-bash
+```bash
 cd smart-file-organizer
+```
 
 
 ### 3. Create a virtual environment
 
-bash
+```bash
 python3 -m venv .venv
+```
 
 
 ### 4. Activate the virtual environment
 
 On macOS/Linux:
 
-bash
+```bash
 source .venv/bin/activate
+```
 
 
 ### 5. Install dependencies
 
-bash
+```bash
 python -m pip install -r requirements.txt
+```
 
 
 
@@ -182,8 +212,9 @@ python -m pip install -r requirements.txt
 
 Run the application with:
 
-bash
+```bash
 python src/main.py
+```
 
 
 The application will request the path of the folder to organize.
@@ -201,30 +232,42 @@ The project uses Pytest for automated testing.
 
 Run all tests with:
 
-bash
+```bash
 python -m pytest
+```
 
 
-The test suite covers core functionality including:
+The test suite covers:
 
 * File scanning
 * Hidden file exclusion
+* Log file exclusion
+* Folder validation
 * File categorization
 * Folder creation
 * File movement
+* Filename conflict handling
+* Missing-file error handling
 * Duplicate detection
 * SHA-256 hashing
+* CLI argument parsing
+* Logging
+* Complete organization workflow
 
 Current test suite:
 
-18 tests
+26 tests
 
 ## Technologies
 
 * Python 3
 * pathlib
 * hashlib
+* argparse
+* shutil
 * Pytest
+* Black
+* Ruff
 * Git
 * GitHub
 
@@ -240,10 +283,14 @@ This project follows several software engineering practices:
 * Type hints
 * Docstrings
 * Automated testing
+* Integration testing
 * Virtual environments
 * Git version control
 * Incremental development
 * Error handling
+* Filename conflict protection
+* Code formatting with Black
+* Static analysis with Ruff
 * Clear project documentation
 
 
@@ -255,11 +302,10 @@ Potential future improvements include:
 * Recursive directory scanning
 * Configurable categories
 * Configurable file extensions
-* Improved error handling
-* Integration tests
-* Code quality and linting tools
+* GitHub Actions / Continuous Integration
 * Packaging the application as an installable CLI tool
 * Performance improvements for large directories
+* Additional end-to-end testing
 
 
 ## Project Documentation
