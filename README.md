@@ -307,6 +307,19 @@ Potential future improvements include:
 * Performance improvements for large directories
 * Additional end-to-end testing
 
+## Screenshots
+
+### Project Structure
+
+![Project Structure](assets/screenshots/architecture.png)
+
+### Dry-Run Mode
+
+![Dry-Run Mode](assets/screenshots/dry-run.png)
+
+### Quality Checks
+
+![Quality Checks](assets/screenshots/quality-checks.png)
 
 ## Project Documentation
 
