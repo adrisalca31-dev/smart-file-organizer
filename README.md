@@ -329,4 +329,8 @@ Additional technical information about the architecture, requirements, design de
 
 ## Author
 
-Developed as part of a professional software engineering portfolio.
+**Adrián Salazar**
+
+Software Engineering Portfolio Project
+
+GitHub: [@adrisalca31-dev](https://github.com/adrisalca31-dev)
